@@ -1,0 +1,30 @@
+{
+    "name": "nerio/laravel-stub",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "caojiayuan",
+            "email": "cjy632258@hotmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "laravel/framework": "^8.12",
+        "cao-jiayuan/laravel-api": "dev-master",
+        "caojiayuan/utility": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Nerio\\LaravelStub": "src/"
+        }
+    },
+    "description": "",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Nerio\\LaravelStub\\StubServiceProvider"
+            ]
+        }
+    }
+}

@@ -1,0 +1,15 @@
+<?php namespace ${AppPath}\${AppName}\Repositories;
+
+use CaoJiayuan\LaravelApi\Http\Repository\Repository as BaseRepository;
+use ${AppPath}\${AppName}\Models\${AppName};
+
+/**
+ * @author caojiayuan
+ */
+class ${AppName}Repository extends BaseRepository
+{
+    public function detail($id)
+    {
+        return ${AppName}::findOrFail($id);
+    }
+}

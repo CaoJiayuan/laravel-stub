@@ -1,0 +1,11 @@
+<?php namespace ${AppPath}\${AppName}\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+/**
+ * @author caojiayuan
+ */
+class ${AppName} extends Model
+{
+
+}

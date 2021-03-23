@@ -1,0 +1,1 @@
+# stub application library
