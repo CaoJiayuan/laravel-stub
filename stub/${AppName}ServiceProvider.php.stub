@@ -1,0 +1,19 @@
+<?php namespace ${AppPath}\${AppName};
+
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Route;
+
+class ${AppName}ServiceProvider extends ServiceProvider
+{
+    public function register()
+    {
+        $this->mergeConfigFrom(__DIR__ . '/config/${appName}.php', '${appName}');
+    }
+
+    public function boot()
+    {
+        Route::prefix('${appName}')
+            ->namespace('${AppPath}\${AppName}\Controllers')
+            ->group(__DIR__ . '/routes.php');
+    }
+}

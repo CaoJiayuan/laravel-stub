@@ -3,9 +3,6 @@
 use Nerio\LaravelStub\Base\Controller;
 use ${AppPath}\${AppName}\Repositories\${AppName}Repository;
 
-/**
- * @author caojiayuan
- */
 class ${AppName}Controller extends Controller
 {
     public function detail(${AppName}Repository $repository, $id)

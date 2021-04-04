@@ -1,6 +1,3 @@
 <?php
-/**
- * @author caojiayuan
- */
 
 Route::get("{id}", "${AppName}Controller@detail");
