@@ -1,6 +1,6 @@
 <?php namespace ${AppPath}\${AppName};
 
-use Illuminate\Support\ServiceProvider;
+use Nerio\LaravelStub\Base\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 
 class ${AppName}ServiceProvider extends ServiceProvider

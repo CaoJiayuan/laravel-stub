@@ -3,7 +3,7 @@
 use Illuminate\Database\Eloquent\Model;
 
 
-class ${AppName} extends Model
+class ${AppNameS} extends Model
 {
 
 }
