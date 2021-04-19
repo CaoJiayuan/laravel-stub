@@ -12,92 +12,97 @@ use function CaoJiayuan\Utility\file_map;
  */
 class MakeCommand extends Command
 {
-    protected $signature = 'make:stub {app : app name}';
+  protected $signature = 'make:stub {app : app name}';
 
-    protected $description = '新建模块应用';
-    private $config;
+  protected $description = '新建模块应用';
+  private $config;
 
-    public function __construct($config)
-    {
-        parent::__construct();
-        $this->config = $config;
+  public function __construct($config)
+  {
+    parent::__construct();
+    $this->config = $config;
+  }
+
+  public function handle()
+  {
+
+    $stdDir = __DIR__ . '/../../stub';
+    $appPath = $this->appPath();
+    if (file_exists(base_path($appPath))) {
+      $this->warn("app exists!");
+
+      return 1;
     }
+    $this->mkdir();
 
-    public function handle()
-    {
+    $replaces = $this->getReplaces();
 
-        $stdDir = __DIR__ . '/../../stub';
-        $appPath = $this->appPath();
-        if (file_exists(base_path($appPath))) {
-            $this->warn("app exists!");
-            return 1;
+    file_map($stdDir, function ($path, \SplFileInfo $info, $isDir) use ($appPath, $stdDir, $replaces) {
+      $p = str_replace(realpath($stdDir), '', realpath($path));
+
+      $filepath = base_path($appPath . $p);
+      if ($isDir) {
+        @mkdir($filepath, 0755, true);
+        $this->info(sprintf("make application dir %s", $filepath));
+      } else {
+        $content = file_get_contents($path);
+        $replacer = function ($content) use ($replaces) {
+          return preg_replace_callback('/\${(.*?)}/', function ($match) use ($replaces) {
+            return Arr::get($replaces, $match[1]);
+          }, $content);
+        };
+        if (Str::contains($filepath, '.stub')) {
+          $filepath = str_replace('.stub', '', $filepath);
+          $content = $replacer($content);
         }
-        $this->mkdir();
 
-        $replaces = $this->getReplaces();
+        $filepath = $replacer($filepath);
 
-        file_map($stdDir, function ($path, \SplFileInfo $info, $isDir) use ($appPath, $stdDir, $replaces) {
-            $p = str_replace(realpath($stdDir), '', realpath($path));
+        file_put_contents($filepath, $content);
+      }
+    });
 
-            $filepath = base_path($appPath . $p);
-            if ($isDir) {
-                @mkdir($filepath, 0755, true);
-                $this->info(sprintf("make application dir %s", $filepath));
-            } else {
-                $content = file_get_contents($path);
-                $replacer = function ($content) use ($replaces) {
-                    return preg_replace_callback('/\${(.*?)}/', function ($match) use ($replaces) {
-                        return Arr::get($replaces, $match[1]);
-                    }, $content);
-                };
-                if (Str::contains($filepath, '.stub')) {
-                    $filepath = str_replace('.stub', '', $filepath);
-                    $content = $replacer($content);
-                }
+    return 0;
+  }
 
-                $filepath = $replacer($filepath);
+  protected function mkdir()
+  {
+    $dir = $this->appPath();
 
-                file_put_contents($filepath, $content);
-            }
-        });
+    if (!file_exists($dir)) {
+      @mkdir(base_path($dir), 0775, true);
 
-        return 0;
+      $this->info(sprintf('make application dir %s', $dir));
     }
+  }
 
-    protected function mkdir()
-    {
-        $dir = $this->appPath();
+  protected function appPath()
+  {
+    $name = $this->appName();
 
-        if (!file_exists($dir)) {
-            @mkdir(base_path($dir), 0775, true);
+    return $this->config['app_path'] . '/' . $name;
+  }
 
-            $this->info(sprintf('make application dir %s', $dir));
-        }
-    }
+  protected function appName()
+  {
+    $name = $this->argument('app');
 
-    protected function appPath()
-    {
-        $name = $this->appName();
+    return ucfirst(Str::camel($name));
+  }
 
-        return  $this->config['app_path'] . '/' . $name;
-    }
+  /**
+   * @return array
+   */
+  protected function getReplaces()
+  {
+    $appName = lcfirst($this->appName());
 
-    protected function appName()
-    {
-        $name = $this->argument('app');
-
-        return ucfirst(Str::camel($name));
-    }
-
-    /**
-     * @return array
-     */
-    protected function getReplaces()
-    {
-        return [
-            'AppPath' => ucfirst($this->config['app_path']),
-            'AppName' => $this->appName(),
-            'appName' => lcfirst($this->appName()),
-        ];
-    }
+    return [
+      'AppPath'  => ucfirst($this->config['app_path']),
+      'AppName'  => $this->appName(),
+      'appName'  => $appName,
+      'AppNameS' => Str::singular($this->appName()),
+      'appNameS' => Str::singular($appName)
+    ];
+  }
 }
