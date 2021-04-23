@@ -16,7 +16,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Nerio\\LaravelStub": "src/"
+            "Nerio\\LaravelStub\\": "src/"
         }
     },
     "description": "",
