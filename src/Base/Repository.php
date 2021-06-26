@@ -68,9 +68,17 @@ class Repository extends \CaoJiayuan\LaravelApi\Http\Repository\Repository
 
   public function writePartial($id, $data)
   {
-    $model = $this->modelOf()->findOrFail($id);
+    return \DB::transaction(function () use ($data, $id) {
+      $model = $this->modelOf()->findOrFail($id);
+      $data = $this->beforeWrite($data);
+      $model->update($data);
 
-    $model->update($data);
+      $this->afterWrite($model, $data);
+
+      return $model;
+    });
+
+
   }
 
   public function like($id)
