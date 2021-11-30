@@ -100,6 +100,50 @@ class Repository extends \CaoJiayuan\LaravelApi\Http\Repository\Repository
     $filters && $this->applyFilters($builder, $filters, $others);
   }
 
+  public function applyFilters($builder, $filters, $others = [], \Closure $then = null)
+  {
+    if (is_array($filters)) {
+      $model = $builder->getModel();
+      $searchables = $model->getFillable();
+
+      $searchables = array_merge($others, $searchables);
+
+      $table = $model->getTable();
+      $builder->where(function ($query) use ($filters, $searchables, $table, $then) {
+        foreach ($filters as $key => $value) {
+          list($key, $op) = $this->parseFilterKey($key);
+          if ($op == 'like') {
+            $value = \DB::raw("'%{$value}%'");
+          }
+          if (in_array($key, $searchables)) {
+            /** @var Builder $query */
+            $column = $key;
+            if (strpos($key, '.') === false) {
+              $column = $table . '.' . $key;
+            }
+            $customOps = $this->customOps();
+            if (array_key_exists($op, $customOps)) {
+              $customOps[$op]($query, $column, $value);
+            } else {
+              $query->where($column, $op, $value);
+            }
+          } else {
+            $then && $then($query, $key, $value, $op);
+          }
+        }
+      });
+    }
+  }
+
+  protected function customOps()
+  {
+    return [
+      'lp' => function ($query, $column, $value) {
+        $query->where($column, "like", "{$value}%");
+      }
+    ];
+  }
+
   public function resolveSort($model, $order, $builder, \Closure $closure = null)
   {
     $orderArr = explode('|', $order, 2);
